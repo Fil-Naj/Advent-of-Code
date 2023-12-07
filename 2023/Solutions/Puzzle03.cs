@@ -75,8 +75,6 @@ internal class Puzzle03 : Puzzle2023<Puzzle03>
         sum.Dump("Part 1 Answer");
     }
 
-    private bool IsSymbol(char c) => !(char.IsDigit(c) || c == Blank);
-
     internal override void Part2()
     {
         Part1();
