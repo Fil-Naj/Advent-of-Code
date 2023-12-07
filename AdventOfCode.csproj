@@ -9,15 +9,44 @@
 
   <ItemGroup>
     <None Remove="2022\Files\puzzle01.txt" />
+    <None Remove="2022\Files\puzzle02.txt" />
+    <None Remove="2022\Files\puzzle03.txt" />
+    <None Remove="2022\Files\puzzle04.txt" />
+    <None Remove="2022\Files\puzzle05.txt" />
+    <None Remove="2022\Files\puzzle06.txt" />
+    <None Remove="2022\Files\puzzle07.txt" />
+    <None Remove="2022\Files\puzzle08.txt" />
+    <None Remove="2022\Files\puzzle09.txt" />
+    <None Remove="2022\Files\puzzle10.txt" />
+    <None Remove="2022\Files\puzzle11.txt" />
+    <None Remove="2022\Files\puzzle12.txt" />
+    <None Remove="2022\Files\puzzle14.txt" />
+    <None Remove="2023\Files\puzzle01.txt" />
+    <None Remove="2023\Files\puzzle02.txt" />
+    <None Remove="2023\Files\puzzle03.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="2022\Files\puzzle14.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle12.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle11.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle10.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle09.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle08.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle07.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle06.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle05.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle04.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle03.txt" />
+    <EmbeddedResource Include="2022\Files\puzzle02.txt" />
     <EmbeddedResource Include="2022\Files\puzzle01.txt" />
+    <EmbeddedResource Include="2023\Files\puzzle03.txt" />
+    <EmbeddedResource Include="2023\Files\puzzle02.txt" />
+    <EmbeddedResource Include="2023\Files\puzzle01.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="2023\Files\" />
-    <Folder Include="2023\Solutions\" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.8.0" />
   </ItemGroup>
 
 </Project>
