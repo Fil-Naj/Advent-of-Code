@@ -97,6 +97,8 @@ internal class Puzzle05 : Puzzle2023<Puzzle05>
             case MapType.HumidityToLocation:
                 HumidityToLocation.Add(map);
                 break;
+            default:
+                break;
         }
     }
 
@@ -111,8 +113,36 @@ internal class Puzzle05 : Puzzle2023<Puzzle05>
     internal override void Part2()
     {
         Part1();
+        var seeds = File[0].Split(' ')[1..].Select(long.Parse).ToArray();
+        List<Range> startRanges = [];
+        for (int i = 0; i < seeds.Length; i += 2) 
+        {
+            startRanges.Add(new Range()
+            {
+                Start = seeds[i],
+                Length = seeds[i + 1]
+            });
+        }
 
-        // Fuck...
+        foreach (var seed in seeds)
+        {
+            var soilNumber = GetRangesFromMap(SeedToSoil, startRanges);
+            var fertilserNumber = GetRangesFromMap(SoilToFertiliser, soilNumber);
+            var waterNumber = GetRangesFromMap(FertiliserToWater, fertilserNumber);
+            var lightNumber = GetRangesFromMap(WaterToLight, waterNumber);
+            var temperatureNumber = GetRangesFromMap(LightToTemperature, lightNumber);
+            var humidityNumber = GetRangesFromMap(TemperatureToHumidity, temperatureNumber);
+            var locationNumber = GetRangesFromMap(HumidityToLocation, humidityNumber);
+        }
+    }
+
+    private List<Range> GetRangesFromMap(List<Map> map, List<Range> sourceRanges)
+    {
+        return null;
+        //var range = map.SingleOrDefault(r => sourceRanges >= r.SourceStart && sourceRanges < r.SourceStart + r.Range);
+        //return range is null
+        //    ? sourceRanges
+        //    : range.DestinationStart + sourceRanges - range.SourceStart;
     }
 
     public class Map
@@ -132,5 +162,17 @@ internal class Puzzle05 : Puzzle2023<Puzzle05>
         LightToTemperature,
         TemperatureToHumidity,
         HumidityToLocation
+    }
+
+    public class Range : IComparable<Range>
+    {
+        public long Start { get; set; }
+        public long Length { get; set; }
+        public long End => Start + Length - 1;
+
+        int IComparable<Range>.CompareTo(Range? other)
+        {
+            return Start > other!.Start ? 1 : -1;
+        }
     }
 }
