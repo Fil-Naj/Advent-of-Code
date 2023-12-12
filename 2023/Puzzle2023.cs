@@ -2,5 +2,14 @@
 
 internal abstract class Puzzle2023<T> : Puzzle<T> where T : class, new()
 {
-    internal override string[] File => System.IO.File.ReadAllLines($"../../../2023/Files/{PuzzleName.ToLower()}.txt");
+    private string[] _file;
+    internal override string[] File
+    {
+        get
+        {
+            //_file ??= System.IO.File.ReadAllLines($"../../../2023/Files/{PuzzleName.ToLower()}.txt");
+
+            return _file ??= System.IO.File.ReadAllLines($"../../../2023/Files/{PuzzleName.ToLower()}.txt");
+        }
+    }
 }
