@@ -85,25 +85,8 @@ internal class Puzzle12 : Puzzle2023<Puzzle12>
     {
         // To be continued...
         var sum = 0L;
-        Parallel.ForEach(
-            File,
-            () => 0L, // Local sum for each thread
-            (line, loopState, localSum) =>
-            {
-                // Perform the operation on the current line
-                long result = FindNumberOfPermutations(line);
-
-                // Add the result to the local sum
-                localSum += result;
-
-                return localSum;
-            },
-            localSum =>
-            {
-                // Add the local sum to the total sum in a thread-safe manner
-                Interlocked.Add(ref sum, localSum);
-            }
-        );
+        foreach (var line in File)
+            sum += FindNumberOfPermutations(line);
 
         sum.Dump("Part 2 Answer");
     }
@@ -112,77 +95,94 @@ internal class Puzzle12 : Puzzle2023<Puzzle12>
     {
         var items = line.Split(' ');
         var str = string.Join('?', Enumerable.Repeat(items[0], 5));
-        var nums = string.Join(',', Enumerable.Repeat(items[1], 5)).Split(',').Select(int.Parse).ToArray();
+        var nums = string.Join(',', Enumerable.Repeat(items[1], 5)).Split(',').Select(int.Parse).ToList();
 
-        StringBuilder sb = new();
         Dictionary<string, long> dp = [];
-        // FFS we have to actually do some optimisation on this one
-        // Time for Dynamiccc Programminggg:
-        // 1. Keep track of all visited strings and how many different ways they can be done (0 if none)
-        // 2. Prune! If shit is fucked already, don't bother with continuing. Give up like a real man!
-        // Uh actually I think that is it?
-        long Dfs(int index)
+        long Dfs(string str, List<int> nums)
         {
-            var currentString = sb.ToString();
+            var key = CreateKey(str, nums);
 
-            // If we have already visited the string, then just return the value from last time
-            if (dp.TryGetValue(currentString, out var value))
-                return value;
+            if (dp.TryGetValue(key, out var val))
+                return val;
 
-            // Prune, baby, prune!
-            var current = CalculateNums(currentString);
-            if (!AreEqualSoFar(current, nums)) return 0;
+            // If we do not have any more groups to create, finish search
+            // If have any broken gears, then not valid solution
+            // If we have ? still left, then we don't care because they all have to be dotss
+            if (nums.Count == 0)
+                return str.Contains('#') ? 0 : 1;
 
-            if (index == str.Length)
+            // If we still have groups to go, but no more strings, then leave brother damn give up
+            if (str.Length == 0) return 0;
+
+            // If next character is a dot, get rid of them allllll up until something ain't a dot
+            if (str.StartsWith('.'))
             {
-                var areEqual = AreEqual(CalculateNums(currentString), nums);
-                var count = areEqual ? 1 : 0;
-                dp[currentString] = count;
-
-                return dp[currentString];
+                var newStr = str.TrimStart('.');
+                var newKey = CreateKey(newStr, nums);
+                dp[newKey] = Dfs(newStr, nums);
+                return dp[newKey];
             }
 
-            if (str[index] == '?')
+            // If we mysterious in this bch, then go find your path by replacing it for a '.' or a '#'
+            if (str.StartsWith('?'))
             {
-                // Count if adding not broken
-                sb.Append('.');
-                var countFromNotBroken = Dfs(index + 1);
-                sb.Length--;
+                // Replace with '.'
+                var newNotBrokenString = '.' + str[1..];
+                var newNotBrokenKey = CreateKey(newNotBrokenString, nums);
+                dp[newNotBrokenKey] = Dfs(newNotBrokenString, nums);
 
-                // Count if adding broken
-                sb.Append('#');
-                var countFromBroken = Dfs(index + 1);
-                sb.Length--;
+                // Replace with '#'
+                var newBrokenString = '#' + str[1..];
+                var newBrokenKey = CreateKey(newBrokenString, nums);
+                dp[newBrokenKey] = Dfs(newBrokenString, nums);
 
-                dp[currentString] = countFromBroken + countFromNotBroken;
 
-                return dp[currentString];
+                return dp[newNotBrokenKey] + dp[newBrokenKey];
             }
 
-            // If not mystery, then just continue
-            sb.Append(str[index]);
-            var countFromContinuing = Dfs(index + 1);
-            sb.Length--;
+            // It's broken records time
+            // At this point, it is guaranteed we have a broken '#'
 
-            dp[currentString] = countFromContinuing;
-            return dp[currentString];
+            // If we have a broken still, but no more groups to make, then it is NOT VALID
+            if (nums.Count == 0) return 0;
+
+            // If we still have groups to make, but not enough brokens to make the group with, then it is INVALID AGAIN
+            if (str.Length < nums[0]) return 0;
+
+            // If we have a record, then everything in this group must either be a '#' or a '?'
+            // Otherwise, this shit is INVALID
+            if (str[..nums[0]].Contains('.')) return 0;
+
+            // If we have two or more groups to go (i.e., not the last one)
+            if (nums.Count > 1)
+            {
+                // If our suspected group is then followed by another '#', you guessed it, IT IS INVALID
+                if (str.Length < nums[0] + 1 || str[nums[0]] == '#') return 0;
+
+                // Now that we are all happy with our pruning, we can be certain that the next nums[0] characters, plus the following one, are all good
+                // Thus, skip to them and remove the current group
+                str = str[(nums[0] + 1)..];
+                nums = nums[1..];
+
+                var newkey = CreateKey(str, nums);
+                dp[newkey] = Dfs(str, nums);
+                return dp[newkey];
+            }
+
+
+            // If we get to here, this is the last group to go
+            str = str[nums[0]..];
+            nums = nums[1..];
+            var newNextStepKey = CreateKey(str, nums);
+            dp[newNextStepKey] = Dfs(str, nums);
+
+            return dp[newNextStepKey];
         }
 
-        var toAdd = Dfs(0);
+        var toAdd = Dfs(str, nums);
+        toAdd.Dump("Count");
         return toAdd;
     }
 
-    private bool AreEqualSoFar(int[] actual, int[] expected)
-    {
-        if (actual.Length > expected.Length) return false;
-
-        // Check that all numbers up to the last one are equal
-        for (int i = 0; i < actual.Length - 1; i++)
-            if (actual[i] != expected[i]) return false;
-
-        // With the last one of the actual array, ensure it is not greater than its respective value in the expected array
-        if (actual.Length > 0 && actual[^1] > expected[actual.Length - 1]) return false;
-
-        return true;
-    }
+    private string CreateKey(string str, List<int> nums) => $"{str}|{string.Join(',', nums)}";
 }
