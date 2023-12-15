@@ -1,5 +1,5 @@
-﻿using AdventOfCode.Extensions;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using AdventOfCode.Extensions;
 
 namespace AdventOfCode._2023.Solutions;
 
@@ -13,7 +13,7 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
         { SlideDirection.West,  (0, -1) },
     };
 
-    private char[][] Grid;
+    private char[][]? Grid;
     private int Rows;
     private int Cols;
 
@@ -51,7 +51,7 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
         var (row, col) = _slideDirections[direction];
 
         // Get ready to move by removing the rock from initial location
-        Grid[rock.Row][rock.Col] = '.';
+        Grid![rock.Row][rock.Col] = '.';
 
         while (CanSlide(rock.Row + row, rock.Col + col))
             rock.Move(row, col);
@@ -64,7 +64,7 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
         // If out of bounds, then nah probs can't slide that way
         if (r < 0 || r >= Rows || c < 0 || c >= Cols) return false;
 
-        return Grid[r][c] == '.';
+        return Grid![r][c] == '.';
     }
 
     internal override void Part2()
@@ -101,7 +101,7 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
                 // WE FOUND A LOOP!
                 // When find a loop:
                 // - Find out how long the loop is
-                // - Find out how many loops are left in the repititions
+                // - Find out how many loops are left in the repetitions
                 // - Go to the last instance of this loop
                 var loopLength = i - reps;
                 dp[key] = i;
@@ -116,17 +116,17 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
             foreach (var rock in rocks)
                 Slide(rock, SlideDirection.North);
 
-            // We want the rocks furtherst left moving LEFT first
+            // We want the rocks furthest left moving LEFT first
             rocks = [.. rocks.OrderBy(r => r.Col)];
             foreach (var rock in rocks)
                 Slide(rock, SlideDirection.West);
 
-            // We want the rocks furtherst down moving DOWN first
+            // We want the rocks furthest down moving DOWN first
             rocks = [.. rocks.OrderByDescending(r => r.Row)];
             foreach (var rock in rocks)
                 Slide(rock, SlideDirection.South);
 
-            // We want the rocks furtherst right moving DOWN first
+            // We want the rocks furthest right moving DOWN first
             rocks = [.. rocks.OrderByDescending(r => r.Col)];
             foreach (var rock in rocks)
                 Slide(rock, SlideDirection.East);
@@ -136,7 +136,7 @@ internal class Puzzle14 : Puzzle2023<Puzzle14>
             line.Dump();
 
         var load = rocks.Sum(rock => Rows - rock.Row);
-
+        sw.ElapsedMilliseconds.Dump("Time (ms)");
         load.Dump("Part 2 Answer");
     }
 
