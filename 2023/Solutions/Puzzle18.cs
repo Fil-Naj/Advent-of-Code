@@ -16,6 +16,13 @@ internal class Puzzle18 : Puzzle2023<Puzzle18>
     // In our axis, left is a negative change in x, while right is positive dx
     // Sum up these y * dx values for each vertex
     // And BOOM! You have the area of some random straight lined shape
+    // But that does not answer our question because each block on the perimeter also counts as 1 cubic metre
+    // Pick's theorem states that, for any grid, the area is equal to the number of blocks inside (I) plus (the number of boundary blocks (B) divided by 2) minus 1
+    // A = I + (B/2) - 1
+    // We have A, and the question is actually asking for I + B (blocks inside + blocks on perimeter)
+    // Rearranging gives
+    // I + B = A + (B/2) + 1
+    // Therefore, the answer is the Area we found with Green's Theorem + (perimeter (which is just sum(numSteps)) / 2) + 1
     internal override void Part1()
     {
         GetAreaGreensTheoremStyle(1).Dump("Part 1 Answer");
